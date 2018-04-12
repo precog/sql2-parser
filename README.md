@@ -1,1 +1,1 @@
-### sql2-parser
+# SQL² Parser [![Build Status](https://travis-ci.org/quasar-analytics/sql2-parser.svg?branch=master)](https://travis-ci.org/quasar-analytics/sql2-parser) [![Bintray](https://img.shields.io/bintray/v/slamdata-inc/maven-public/sql2-parser.svg)](https://bintray.com/slamdata-inc/maven-public/sql2-parser) [![Discord](https://img.shields.io/discord/373302030460125185.svg?logo=discord)](https://discord.gg/QNjwCg6)
