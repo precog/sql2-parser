@@ -1,7 +1,6 @@
 import github.GithubPlugin._
 
 import scala.Predef._
-import quasar.project._
 
 import java.lang.{Integer, String, Throwable}
 import scala.{Boolean, List, Predef, None, Some, StringContext, sys, Unit}, Predef.{any2ArrowAssoc, assert, augmentString}
@@ -65,17 +64,6 @@ lazy val buildSettings = commonBuildSettings ++ Seq(
   logBuffered in Test := isTravisBuild.value,
 
   console := { (console in Test).value }) // console alias test:console
-
-val targetSettings = Seq(
-  target := {
-    import java.io.File
-
-    val root = (baseDirectory in ThisBuild).value.getAbsolutePath
-    val ours = baseDirectory.value.getAbsolutePath
-
-    new File(root + File.separator + ".targets" + File.separator + ours.substring(root.length))
-  }
-)
 
 // In Travis, the processor count is reported as 32, but only ~2 cores are
 // actually available to run.
@@ -147,25 +135,6 @@ lazy val githubReleaseSettings =
       pushChanges)
   )
 
-def isolatedBackendSettings(classnames: String*) = Seq(
-  isolatedBackends in Global ++=
-    classnames.map(_ -> (fullClasspath in Compile).value.files),
-
-  packageOptions in (Compile, packageBin) +=
-    Package.ManifestAttributes("Backend-Module" -> classnames.mkString(" ")))
-
-lazy val isCIBuild               = settingKey[Boolean]("True when building in any automated environment (e.g. Travis)")
-lazy val isIsolatedEnv           = settingKey[Boolean]("True if running in an isolated environment")
-lazy val exclusiveTestTag        = settingKey[String]("Tag for exclusive execution tests")
-lazy val sparkDependencyProvided = settingKey[Boolean]("Whether or not the spark dependency should be marked as provided. If building for use in a Spark cluster, one would set this to true otherwise setting it to false will allow you to run the assembly jar on it's own")
-
-lazy val isolatedBackends =
-  taskKey[Seq[(String, Seq[File])]]("Global-only setting which contains all of the classpath-isolated backends")
-
-isolatedBackends in Global := Seq()
-
-lazy val sideEffectTestFSConfig = taskKey[Unit]("Rewrite the JVM environment to contain the filesystem classpath information for integration tests")
-
 def createBackendEntry(childPath: Seq[File], parentPath: Seq[File]): Seq[File] =
   (childPath.toSet -- parentPath.toSet).toSeq
 
@@ -183,33 +152,27 @@ lazy val root = project.in(file("."))
 /** SQL Parser module.
   */
 lazy val sql2parser = project
-  .settings(name := "quasar-sql2sparser")
+  .settings(name := "sql2-parser")
   .settings(commonSettings)
-  .settings(targetSettings)
   .settings(resolvers ++= Seq(
     Resolver.bintrayRepo("slamdata-inc", "maven-public"),
     "bintray-djspiewak-maven" at "https://dl.bintray.com/djspiewak/maven"))
   .settings(
-    libraryDependencies ++= Dependencies.sql2parser,
-    wartremoverWarnings in (Compile, compile) --= Seq(
-      Wart.AsInstanceOf,
-      Wart.Equals,
-      Wart.Overloading))
+    libraryDependencies ++= Seq(
+      "com.slamdata"     %% "slamdata-predef"     % Versions.SlamDataPredef,
+      "com.codecommit"   %% "parseback-core"      % Versions.Parseback))
   .settings(githubReleaseSettings)
-  .settings(isolatedBackendSettings("quasar.physical.sql2parser.Sql2Parser$"))
   .settings(excludeTypelevelScalaLibrary)
   .enablePlugins(AutomateHeaderPlugin)
 
 /** Integration tests
   */
 lazy val it = project
-  .settings(name := "quasar-sql2parser-it")
+  .settings(name := "sql2-parser-it")
   .configs(ExclusiveTests)
   .dependsOn(sql2parser)
   .settings(commonSettings)
   .settings(publishTestsSettings)
-  .settings(targetSettings)
-  .settings(libraryDependencies ++= Dependencies.it)
   // Configure various test tasks to run exclusively in the `ExclusiveTests` config.
   .settings(inConfig(ExclusiveTests)(Defaults.testTasks): _*)
   .settings(inConfig(ExclusiveTests)(exclusiveTasks(test, testOnly, testQuick)): _*)
