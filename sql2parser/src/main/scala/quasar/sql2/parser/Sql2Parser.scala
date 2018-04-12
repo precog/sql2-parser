@@ -16,10 +16,10 @@
 
 package quasar.sql2.parser
 
-import slamdata.Predef.Int
+import slamdata.Predef.{Int, println}
+
+import cats.Eval
 import parseback._
-import parseback.compat.scalaz._
-import scalaz._
 
 object Sql2Parser {
 
@@ -28,8 +28,9 @@ object Sql2Parser {
       | () ^^^ 0
     )
 
-  val x = LineStream[Need]("")
-  p(x).value
+  val x = LineStream[Eval]("")
+
+  println(p(x).value)
 
 }
 
