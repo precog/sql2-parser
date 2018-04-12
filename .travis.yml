@@ -32,13 +32,6 @@ env:
     # DISCORD_WEBHOOK_TOKENS
     - secure: "q3KS34BGU8+SXCA7TO5brVoCpJ59+4ire+deWa8bsp/sRoeXPEQkfPehObxiXCjDG7so/hv3mK2K7OSv6Uf4uCST1fqe3T/YlO6h/yNG4nJBjK1hTHGf7+eADvPTLqDshCvg3VPrajvAA6qHcn+O7fCUkCH5rLt3aeMxP1Ha9YL6KRDF/HjlDdTt6DLrLiDV/U9i2XiHFGNwr4iePfh05B5mCH+poQ1+atR74ucKvwhqZki94I22+tfG/3JuJf/RgTGx5lRBffbH/7WwgfH4VXxEvU2tG6boMVL5ooCrvWCfdXFERbqewLsZgCRDYTgHp+9OcTRxDTR9P1htN9UZjYIgCcYjKqBbtd+h3S2PpzN9ELd2uRljo8ZiehV++wdsi3U4YWfvY4MH3ZCA96p4QCK26mk+5gQLa7VF41LU8eb26Ma4BWz8RwAqiDe4EhY1PdAfYeCJ4YiMhXg3KHbooJ3LDGeXqKLCkFLiAVynx1z6npQnV1flgk2AAivWBZbmlUDgR7b1TWmTEpvebV0tfoGcN5YJgIbRJuUJy0qG8ZtpDP8R03Wg+amErQpSb8TEwUztUwmeLrv/e7Fky5YKpu1uJjJ1YsFGTruoaWg8axRTo2PEYo00RdtixgKaP5s/Aye+cUv5nYjSzQeW2orJuxQmNPIe7WwwpumTzJNnZSY="
 
-# test script
-script:
-  - set -e
-  # - $SBT preBuild
-  - $SBT ++$TRAVIS_SCALA_VERSION test
-  # - $SBT postBuild
-
 jobs:
   include:
     - stage: clean
@@ -54,6 +47,13 @@ jobs:
         - set -e
         # - $SBT preBuild
         - $SBT ++$TRAVIS_SCALA_VERSION test:compile
+        # - $SBT postBuild
+
+    - stage: test
+      script:
+        - set -e
+        # - $SBT preBuild
+        - $SBT ++$TRAVIS_SCALA_VERSION test
         # - $SBT postBuild
 
     - stage: publish
