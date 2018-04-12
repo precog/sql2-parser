@@ -5,8 +5,6 @@ dist: trusty
 sudo: required
 
 stages:
-  - name: clean
-    if: NOT type = pull_request
   - name: build
   - name: test
   - name: publish
@@ -34,14 +32,6 @@ env:
 
 jobs:
   include:
-    - stage: clean
-      env:
-      git:
-        depth: false
-      script:
-        - set -e
-        - $SBT clean
-
     - stage: build
       script:
         - set -e
