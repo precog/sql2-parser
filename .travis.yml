@@ -4,21 +4,40 @@ jdk: oraclejdk8
 dist: trusty
 sudo: required
 
-services:
+stages:
   - name: clean
+    if: NOT type = pull_request
   - name: build
   - name: test
-  - name: changelog
   - name: publish
     if: NOT type = pull_request
 
 cache:
   directories:
-    - $HOME/.cache/dist
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+    - $HOME/.coursier/cache
+    - '.hoarder-cache'
 
 env:
   global:
-    - AVAR="myvar"
+    - COURSIER_PROGRESS=0
+    - SBT=./sbt
+    # ENCRYPTION_PASSWORD
+    - secure: "rdoZDfrWG4W6n8oY9ixa33f/99wkyOJsWcnKp6Ruo97Bwn6hfImYKCe9KUQDefaLM53Ht7hWar8pfFiKHAVN2CZn6bdh/SU4D2cpxjOdb/r6TrmnZ5ILJbTa3EQbOrA8Kay5IKTBLoOQ+HpRYE/1+FbBKt4F6wdop/j5ixTThQJ1hhtfzgLxhYViT0DpNdrfmkTCEimrwMSWN7V/PY4JXRLRXb4MJv4Bexk7rTp5EZQOqnO7fxW8NBCdtZTqzG0jkWC2nPVh92XMqfQILVkvdz+N1Byw0kWbIuzXefD9BLFzece3oSS5K50aExXSHmebfbzpDWkRSP4sK1gO7QaYKxd+QLV0T8NK82PnW52+8IfJME06jIe6QNNYiweOXSx2Ok3N1myuRaKnfwi3ijuRasti3cgQsxBwDdVlsSSZcxIcxU26ptiUrr/vbcHSc7aG3lYhn9NyxCidP8e/UIFgOgVkKxwAr3v1VkS4BPybr3wGA8XElYXhw0fa/MNcTJfOG3ecAaEzaM/a3LXJcjT+3UmgabRg52HOzq1TntqijFy/p0GJzeCXVZqRvLEgdm7Vglvf6voEXIUxj9g6yxGLgcJrj/fBH1f/M/09Q8YfHh5vg+KXhI+jPDr0ZJjHNwFbpDK+EYyFNd57Cod0HD4KsiMRJRrOcVZXlkoW+REqTSU="
+    # GITHUB_TOKEN
+    - secure: "UffRoASlET80/6u8vzHRgx8WDRY7pk/+AIvaCGCETfewu050P+QX8sbgNDX1ZWy3go/op7m9M6Sh7sYHoJ3lzXRG+04II+jaMxEP9NUDxwDVSKRNUc66nKP19Qcx8FiAD0rW9xohCaNS28sJZM5cOqnXPARuRI2/nXJ1WAahsdn0j0Jr/s7mBcOJLbqxpoC9WKjERWTKMixEnSrBMZddWL2HXooqVhL4j9pXE/IxSBDU8c9POIi/YrUChvvynx18eOJ3rihvYVdqkbSqWnl8Z50onFl9e4RYO2nfhIXGYhXl/TYsRXiwI33yAfaJH4ccez+rKeRWgL9Lsn1+f4onrQF9MjE6DgRPMmU9mVo+RdoJxam//rxdls7FfW8xKRGq2a44Qy95Mcyldx01Q3b8+w54F9Pe5AoLBQuXcFRRxdTJuwKqtjg0AVMT9hVd5GnkszZYAE3bAuTYFxmlIg2Bdwu5CBKCAMTfRt0iQVHEmIxTNypWMYGx9wfEn07xsPTCwfTETe8TXQa545UHdOKfxHAGDg0mD6xF1YFCSHlMWRS1zR1qQr3SRMKMGlknt3ay6SdfwfDdkRkhqXCF0LOIII0tdDveC8XXbaHd08H3UlvD2CMw1IqiP21k8KDHacR4dD9n3bmg2o9/GcMdHd6cIHfTxD3mimXKJfWakqXXwgY="
+    # GITHUB_ACCESS_TOKEN
+    - secure: "m97AmqMM5sJG5WqXOJ6cRwswALtF0aGkkpcRIQhMzzkrt8pGv/BmGXopFAgXijKmdnzAsP0oABUmWZ1KzHW7l6HbO7kla8t7aH9ymUmOdwRsVPh/0bEnH9/z3hjAoLEQpgypQm6OtcqkP5l03DmhTeHC/gxCQaMQXKIg1+2dvlyIGRz23+V2iAqE5CEer+7xlSlzd4KwqLSC3DDeGj30OictRDnOEulc8Ep3q2Kr8xYLqH2Gj1WErxHXurUGtj4rsTsi9DFADj1SB3UgKkT+M9MoBcW27ZVj3YpKtMlKcwRph0jBBQRxff6w1GMZmfA16wOX5F5NG4vSbNSycfTNmNFFKbKAPYPPtN/NezU8/aDKMgGUb58Sig8mGJbQktwXbBlJBx3VcU6ApI5X09NRY763DPKq+oWXNjBAjDht8ESLWC5tHrzV1nmVv1rRNFpihpH4RWTAOMXY0nqy4w2hOZmWIkOCNu0cZxPW2Qh+mP45Cf24e3OTTPkW3x5I+Z5WJwRfEC04tM3cVD8imYm0lc4SeTH4pOfmEoLA3g2a1leLg1RUlWiIB4DQ5p/SRoW5gPLBrkxLmdPOTos3ax0mTZjCyHYGvg/Ia8QbOuAw/nc7eqKqy8J5sUdFmyDsljW14amyRjNglSX6leu/s/hC974CKtfeNnO4hMyfbl7dN4g="
+    # DISCORD_WEBHOOK_TOKENS
+    - secure: "q3KS34BGU8+SXCA7TO5brVoCpJ59+4ire+deWa8bsp/sRoeXPEQkfPehObxiXCjDG7so/hv3mK2K7OSv6Uf4uCST1fqe3T/YlO6h/yNG4nJBjK1hTHGf7+eADvPTLqDshCvg3VPrajvAA6qHcn+O7fCUkCH5rLt3aeMxP1Ha9YL6KRDF/HjlDdTt6DLrLiDV/U9i2XiHFGNwr4iePfh05B5mCH+poQ1+atR74ucKvwhqZki94I22+tfG/3JuJf/RgTGx5lRBffbH/7WwgfH4VXxEvU2tG6boMVL5ooCrvWCfdXFERbqewLsZgCRDYTgHp+9OcTRxDTR9P1htN9UZjYIgCcYjKqBbtd+h3S2PpzN9ELd2uRljo8ZiehV++wdsi3U4YWfvY4MH3ZCA96p4QCK26mk+5gQLa7VF41LU8eb26Ma4BWz8RwAqiDe4EhY1PdAfYeCJ4YiMhXg3KHbooJ3LDGeXqKLCkFLiAVynx1z6npQnV1flgk2AAivWBZbmlUDgR7b1TWmTEpvebV0tfoGcN5YJgIbRJuUJy0qG8ZtpDP8R03Wg+amErQpSb8TEwUztUwmeLrv/e7Fky5YKpu1uJjJ1YsFGTruoaWg8axRTo2PEYo00RdtixgKaP5s/Aye+cUv5nYjSzQeW2orJuxQmNPIe7WwwpumTzJNnZSY="
+
+# test script
+script:
+  - set -e
+  - $SBT preBuild
+  - $SBT ++$TRAVIS_SCALA_VERSION test
+  - $SBT postBuild
 
 jobs:
   include:
@@ -27,41 +46,37 @@ jobs:
       git:
         depth: false
       script:
-        - echo "clean"
+        - set -e
+        - $SBT clean
 
     - stage: build
       script:
-        - echo "build"
-
-    - stage: test
-      env:
-      git:
-        depth: false
-      script:
-        - echo "test"
-
-    - stage: changelog
-      env:
-      git:
-        depth: false
-      script:
-        - echo "changelog"
+        - set -e
+        - $SBT preBuild
+        - $SBT ++$TRAVIS_SCALA_VERSION test:compile
+        - $SBT postBuild
 
     - stage: publish
       env:
       script:
-        - echo "Deploying..."
+        - set -e
+        - $SBT transferPublishAndTagResources
+        - TRAVIS_JOB_NUMBER=1 scripts/publishAndTag 'quasar-analytics/sql2-parser'
+
       git:
         depth: false
-      deploy:
-        - provider: releases
-          skip_cleanup: true
-          api_key:
-            secure: "slamdata-bot-key"
-          file:
-            - $HOME/.cache/dist/*
-          on:
-            repo: quasar/sql2-parser
-            branch: release
-            tags: true
 
+after_success:
+  - scripts/discordTravisPost success https://discordapp.com/api/webhooks/$DISCORD_WEBHOOK_TOKENS
+
+after_failure:
+  - scripts/discordTravisPost failure https://discordapp.com/api/webhooks/$DISCORD_WEBHOOK_TOKENS
+
+branches:
+  only:
+    - master
+    - /^backport.*$/
+
+before_cache:
+  - find "$HOME/.sbt/" -name '*.lock' -print0 | xargs -0 rm
+  - find "$HOME/.ivy2/" -name 'ivydata-*.properties' -print0 | xargs -0 rm
