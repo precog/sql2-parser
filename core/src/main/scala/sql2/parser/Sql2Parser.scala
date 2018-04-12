@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package quasar.sql2.parser
+package sql2.parser
 
 import parseback._
 
