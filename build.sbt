@@ -144,14 +144,16 @@ lazy val root = project.in(file("."))
   .settings(transferPublishAndTagResources)
   .settings(aggregate in assembly := false)
   .settings(excludeTypelevelScalaLibrary)
-  .aggregate(sql2parser)
+  .aggregate(coreJVM, coreJS)
   .enablePlugins(AutomateHeaderPlugin)
 
 // common components
 
 /** SQL Parser module.
   */
-lazy val sql2parser = project
+lazy val core = crossProject
+  .crossType(CrossType.Pure)
+  .in(file("core"))
   .settings(name := "sql2-parser")
   .settings(commonSettings)
   .settings(resolvers ++= Seq(
@@ -159,8 +161,10 @@ lazy val sql2parser = project
     "bintray-djspiewak-maven" at "https://dl.bintray.com/djspiewak/maven"))
   .settings(
     libraryDependencies ++= Seq(
-      "com.slamdata"     %% "slamdata-predef"     % Versions.SlamDataPredef,
-      "com.codecommit"   %% "parseback-core"      % Versions.Parseback))
+      "com.codecommit" %%% "parseback-core"  % Versions.Parseback))
   .settings(githubReleaseSettings)
   .settings(excludeTypelevelScalaLibrary)
   .enablePlugins(AutomateHeaderPlugin)
+
+lazy val coreJS = core.js
+lazy val coreJVM = core.jvm
