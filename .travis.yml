@@ -1,0 +1,67 @@
+language: scala
+scala: 2.12.4 # this needs to be in sync with Scala version used in .appveyor.yml
+jdk: oraclejdk8
+dist: trusty
+sudo: required
+
+services:
+  - name: clean
+  - name: build
+  - name: test
+  - name: changelog
+  - name: publish
+    if: NOT type = pull_request
+
+cache:
+  directories:
+    - $HOME/.cache/dist
+
+env:
+  global:
+    - AVAR="myvar"
+
+jobs:
+  include:
+    - stage: clean
+      env:
+      git:
+        depth: false
+      script:
+        - echo "clean"
+
+    - stage: build
+      script:
+        - echo "build"
+
+    - stage: test
+      env:
+      git:
+        depth: false
+      script:
+        - echo "test"
+
+    - stage: changelog
+      env:
+      git:
+        depth: false
+      script:
+        - echo "changelog"
+
+    - stage: publish
+      env:
+      script:
+        - echo "Deploying..."
+      git:
+        depth: false
+      deploy:
+        - provider: releases
+          skip_cleanup: true
+          api_key:
+            secure: "slamdata-bot-key"
+          file:
+            - $HOME/.cache/dist/*
+          on:
+            repo: quasar/sql2-parser
+            branch: release
+            tags: true
+
