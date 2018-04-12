@@ -144,7 +144,7 @@ lazy val root = project.in(file("."))
   .settings(transferPublishAndTagResources)
   .settings(aggregate in assembly := false)
   .settings(excludeTypelevelScalaLibrary)
-  .aggregate(sql2parser, it)
+  .aggregate(sql2parser)
   .enablePlugins(AutomateHeaderPlugin)
 
 // common components
@@ -162,20 +162,5 @@ lazy val sql2parser = project
       "com.slamdata"     %% "slamdata-predef"     % Versions.SlamDataPredef,
       "com.codecommit"   %% "parseback-core"      % Versions.Parseback))
   .settings(githubReleaseSettings)
-  .settings(excludeTypelevelScalaLibrary)
-  .enablePlugins(AutomateHeaderPlugin)
-
-/** Integration tests
-  */
-lazy val it = project
-  .settings(name := "sql2-parser-it")
-  .configs(ExclusiveTests)
-  .dependsOn(sql2parser)
-  .settings(commonSettings)
-  .settings(publishTestsSettings)
-  // Configure various test tasks to run exclusively in the `ExclusiveTests` config.
-  .settings(inConfig(ExclusiveTests)(Defaults.testTasks): _*)
-  .settings(inConfig(ExclusiveTests)(exclusiveTasks(test, testOnly, testQuick)): _*)
-  .settings(parallelExecution in Test := false)
   .settings(excludeTypelevelScalaLibrary)
   .enablePlugins(AutomateHeaderPlugin)
